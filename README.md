@@ -8,7 +8,7 @@ I plan on releasing this as a NuGet package, but I've never gotten that far, so 
 Disclaimer: I haven't got VS on this computer (I'm out and about) so haven't built this, let me know if there is anything amiss like namespaces or missing files. Cheers.
 
 
-Example usage of bundling with SourceMap generation
+Bundling with SourceMap generation
 ---------------------------------------------------
 (note: has a dependency on AjaxMin which can be grabbed from NuGet. Currently it seems it only supports .js.map generation, but my builder should support CSS once AjaxMin does.)
 
@@ -17,7 +17,7 @@ Example usage of bundling with SourceMap generation
     );
 
 
-Example usage of bundling with Css Rewrite tranformer fix
+Bundling with Css Rewrite Url Tranformer fix
 ---------------------------------------------------------
 
     BundleTable.Bundles.Add(new AjaxMinBundle("MyBundleVirtualPath", BundleFileTypes.StyleSheet)
