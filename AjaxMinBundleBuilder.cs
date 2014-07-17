@@ -54,7 +54,10 @@ namespace BenMcCallum.AspNetBundling
             foreach (var file in files)
             {
                 var filePath = System.Web.Hosting.HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
-                contentConcated.AppendLine(";///#SOURCE 1 1 " + filePath);
+                if (bundleFileType == BundleFileTypes.JavaScript)
+                {
+                    contentConcated.AppendLine(";///#SOURCE 1 1 " + filePath);
+                }
                 contentConcated.AppendLine(file.ApplyTransforms());
             }
             var contentConcatedString = contentConcated.ToString();
