@@ -1,5 +1,6 @@
-﻿using Microsoft.Ajax.Utilities;
-using Sitecore.Diagnostics;
+﻿using System.Diagnostics;
+
+using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,7 +113,7 @@ namespace BenMcCallum.AspNetBundling
             }
             catch (Exception ex)
             {
-                Log.Warn("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(AjaxMinBundleBuilder));
+                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(AjaxMinBundleBuilder));
                 return GenerateGenericErrorsContent(contentConcatedString);
             }
         }
