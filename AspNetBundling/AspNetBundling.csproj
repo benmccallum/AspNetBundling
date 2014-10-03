@@ -7,8 +7,8 @@
     <ProjectGuid>{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BenMcCallum.AspNetBundling</RootNamespace>
-    <AssemblyName>BenMcCallum.AspNetBundling</AssemblyName>
+    <RootNamespace>AspNetBundling</RootNamespace>
+    <AssemblyName>AspNetBundling</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>

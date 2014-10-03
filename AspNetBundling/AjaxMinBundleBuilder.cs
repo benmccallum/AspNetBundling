@@ -16,7 +16,7 @@ namespace AspNetBundling
     /// </summary>
     public class AjaxMinBundleBuilder : IBundleBuilder
     {
-        private BundleFileTypes bundleFileType;
+        private readonly BundleFileTypes bundleFileType;
 
         public AjaxMinBundleBuilder(BundleFileTypes bundleFileType)
         {
@@ -45,6 +45,11 @@ namespace AspNetBundling
             var sourcePath = HostingEnvironment.MapPath(bundle.Path);
             var mapPath = HostingEnvironment.MapPath(mapVirtualPath);
             var directoryPath = Path.GetDirectoryName(mapPath);
+            if (directoryPath == null)
+            {
+                throw new InvalidOperationException("directoryPath was invalid.");
+            }
+
             if (!Directory.Exists(directoryPath))
             {
                 Directory.CreateDirectory(directoryPath);
@@ -54,7 +59,7 @@ namespace AspNetBundling
             var contentConcated = new StringBuilder();
             foreach (var file in files)
             {
-                var filePath = System.Web.Hosting.HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
+                var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
                 if (bundleFileType == BundleFileTypes.JavaScript)
                 {
                     contentConcated.AppendLine(";///#SOURCE 1 1 " + filePath);
@@ -81,15 +86,15 @@ namespace AspNetBundling
                         TermSemicolons = true
                     };
 
-                    var minifier = new Minifier();                    
-                    string contentMinified = null;
+                    var minifier = new Minifier();
+                    string contentMinified;
                     switch (bundleFileType)
                     {
                         case BundleFileTypes.JavaScript:
                             contentMinified = minifier.MinifyJavaScript(contentConcatedString, settings);
                             break;
                         case BundleFileTypes.StyleSheet:
-                            var cssSettings = new CssSettings()
+                            var cssSettings = new CssSettings
                             {
                                 TermSemicolons = true
                             };
@@ -125,7 +130,7 @@ namespace AspNetBundling
             sbContent.Append("An error occurred during minification, see Sitecore log for more details - returning concatenated content unminified.").Append("\r\n");
             sbContent.Append(" */\r\n");
             sbContent.Append(contentConcatedString);
-            return sbContent.ToString();;
+            return sbContent.ToString();
         }
 
         private static string GenerateMinifierErrorsContent(string contentConcatedString, Minifier minifier)
@@ -133,9 +138,9 @@ namespace AspNetBundling
             var sbContent = new StringBuilder();
             sbContent.Append("/* ");
             sbContent.Append("An error occurred during minification, see errors below - returning concatenated content unminified.").Append("\r\n");
-            foreach (object error in minifier.ErrorList)
+            foreach (var error in minifier.ErrorList)
             {
-                sbContent.Append(error.ToString()).Append("\r\n");
+                sbContent.Append(error).Append("\r\n");
             }
             sbContent.Append(" */\r\n");
             sbContent.Append(contentConcatedString);
