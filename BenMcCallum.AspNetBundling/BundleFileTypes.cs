@@ -1,4 +1,4 @@
-﻿namespace BenMcCallum.AspNetBundling
+﻿namespace AspNetBundling
 {
     public enum BundleFileTypes
     {

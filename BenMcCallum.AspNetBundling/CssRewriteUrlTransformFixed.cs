@@ -27,7 +27,7 @@ namespace System.Web.Optimization
             {
                 return content;
             }
-            Regex regex = new Regex("url\\(['\"]?(?<url>[^)]+?)['\"]?\\)");
+            var regex = new Regex("url\\(['\"]?(?<url>[^)]+?)['\"]?\\)");
             return regex.Replace(content, (Match match) => "url(" + CssRewriteUrlTransformFixed.RebaseUrlToAbsolute(baseUrl, match.Groups["url"].Value) + ")");
         }
         public string Process(string includedVirtualPath, string input)
@@ -36,7 +36,7 @@ namespace System.Web.Optimization
             {
                 throw new ArgumentNullException("includedVirtualPath");
             }
-            string directory = VirtualPathUtility.GetDirectory(includedVirtualPath.Substring(1));
+            var directory = VirtualPathUtility.GetDirectory(includedVirtualPath.Substring(1));
             return CssRewriteUrlTransformFixed.ConvertUrlsToAbsolute(directory, input);
         }
     }

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$id$</title>
+    <authors>Ben McCallum</authors>
+    <owners>Ben McCallum</owners>
+    <description>An assortment of bundling utility classes like custom transformers that can generate source maps and fixes for the ASP.NET Web Optimization bundling framework.</description>
+    <projectUrl>http://github.com/benmccallum/AspNetBundling</projectUrl>
+    <tags>Core ASP.NET Web Optimization Bundling</tags>
+	<frameworkAssemblies>
+      <frameworkAssembly assemblyName="Microsoft.CSharp" targetFramework="" />
+	  <frameworkAssembly assemblyName="System" targetFramework="" />
+      <frameworkAssembly assemblyName="System.Web" targetFramework="" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

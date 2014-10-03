@@ -1,6 +1,6 @@
 ﻿using System.Web.Optimization;
 
-namespace BenMcCallum.AspNetBundling
+namespace AspNetBundling
 {
     /// <summary>
     /// Represents a list of file references to be bundled together as a single resource

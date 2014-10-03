@@ -8,7 +8,7 @@ using System.Text;
 using System.Web.Hosting;
 using System.Web.Optimization;
 
-namespace BenMcCallum.AspNetBundling
+namespace AspNetBundling
 {
     /// <summary>
     /// Represents a custom AjaxMin bundle builder for bundling from individual file contents.

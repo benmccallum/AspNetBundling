@@ -1,9 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenMcCallum.AspNetBundling", "BenMcCallum.AspNetBundling\BenMcCallum.AspNetBundling.csproj", "{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}"
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetBundling", "BenMcCallum.AspNetBundling\AspNetBundling.csproj", "{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
