@@ -14,15 +14,8 @@ namespace AspNetBundling
     /// Represents a custom AjaxMin bundle builder for bundling from individual file contents.
     /// Generates source map files for JS and CSS.
     /// </summary>
-    public class AjaxMinBundleBuilder : IBundleBuilder
+    public class AjaxMinScriptBundleBuilder : IBundleBuilder
     {
-        private readonly BundleFileTypes bundleFileType;
-
-        public AjaxMinBundleBuilder(BundleFileTypes bundleFileType)
-        {
-            this.bundleFileType = bundleFileType;
-        }
-
         public string BuildBundleContent(Bundle bundle, BundleContext context, IEnumerable<BundleFile> files)
         {
             if (files == null)
@@ -56,17 +49,7 @@ namespace AspNetBundling
             }
 
             // Concatenate file contents to be minified, including the sourcemap hints
-            var contentConcated = new StringBuilder();
-            foreach (var file in files)
-            {
-                var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
-                if (bundleFileType == BundleFileTypes.JavaScript)
-                {
-                    contentConcated.AppendLine(";///#SOURCE 1 1 " + filePath);
-                }
-                contentConcated.AppendLine(file.ApplyTransforms());
-            }
-            var contentConcatedString = contentConcated.ToString();
+            var contentConcatedString = GetContentConcated(files);
 
             // Try minify (+ source map) using AjaxMin dll
             try
@@ -76,8 +59,6 @@ namespace AspNetBundling
                 using (var mapWriter = new StreamWriter(mapPath, false, new UTF8Encoding(false)))
                 using (var sourceMap = new V3SourceMap(mapWriter))
                 {
-                    sourceMap.StartPackage(sourcePath, mapPath);
-
                     var settings = new CodeSettings()
                     {
                         EvalTreatment = EvalTreatment.MakeImmediateSafe,
@@ -86,23 +67,10 @@ namespace AspNetBundling
                         TermSemicolons = true
                     };
 
+                    sourceMap.StartPackage(sourcePath, mapPath);
+
                     var minifier = new Minifier();
-                    string contentMinified;
-                    switch (bundleFileType)
-                    {
-                        case BundleFileTypes.JavaScript:
-                            contentMinified = minifier.MinifyJavaScript(contentConcatedString, settings);
-                            break;
-                        case BundleFileTypes.StyleSheet:
-                            var cssSettings = new CssSettings
-                            {
-                                TermSemicolons = true
-                            };
-                            contentMinified = minifier.MinifyStyleSheet(contentConcatedString, cssSettings, settings);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException("Unrecognised BundleFileTypes enum value. Could not find minifier method to handle.");
-                    }
+                    string contentMinified = minifier.MinifyJavaScript(contentConcatedString, settings);
                     if (minifier.ErrorList.Count > 0)
                     {
                         return GenerateMinifierErrorsContent(contentConcatedString, minifier);
@@ -114,11 +82,11 @@ namespace AspNetBundling
                     sourceMap.EndFile(contentWriter, "\r\n");
                 }
 
-                return contentBuilder.ToString();
+                return contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=").ToString();
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(AjaxMinBundleBuilder));
+                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(AjaxMinScriptBundleBuilder));
                 return GenerateGenericErrorsContent(contentConcatedString);
             }
         }
@@ -145,6 +113,35 @@ namespace AspNetBundling
             sbContent.Append(" */\r\n");
             sbContent.Append(contentConcatedString);
             return sbContent.ToString();
+        }
+
+        private static string GetContentConcated(IEnumerable<BundleFile> files)
+        {
+            var contentConcated = new StringBuilder();
+
+            foreach (var file in files)
+            {
+                // Get a file path to save the transformed contents as 
+                var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
+                
+                // Get the contents of the bundle,
+                // noting it may have transforms applied that could mess with any source mapping we want to do
+                var contents = file.ApplyTransforms();
+
+                // If there were transforms that were applied
+                if (file.Transforms.Count > 0)
+                {
+                    // Write the transformed contents to disk to refer our mapping to
+                    filePath = Path.ChangeExtension(filePath, ".transformed" + Path.GetExtension(filePath));                    
+                    File.WriteAllText(filePath, contents);
+                }
+
+                // Source header line then source code
+                contentConcated.AppendLine("///#source 1 1 " + filePath);
+                contentConcated.AppendLine(contents);
+            }
+
+            return contentConcated.ToString();
         }
     }
 }

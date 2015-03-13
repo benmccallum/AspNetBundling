@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetBundling", "AspNetBundling\AspNetBundling.csproj", "{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspNetBundling.TestWebsite", "AspNetBundling.TestWebsite\AspNetBundling.TestWebsite.csproj", "{451C2941-F8ED-41E5-B3A6-35838DAC54BA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +17,10 @@ Global
 		{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E74B2414-29C4-41F8-9C7A-09CDF0A0D483}.Release|Any CPU.Build.0 = Release|Any CPU
+		{451C2941-F8ED-41E5-B3A6-35838DAC54BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{451C2941-F8ED-41E5-B3A6-35838DAC54BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{451C2941-F8ED-41E5-B3A6-35838DAC54BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{451C2941-F8ED-41E5-B3A6-35838DAC54BA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
