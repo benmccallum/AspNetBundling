@@ -1,2 +1,2 @@
-nuget pack -Prop Configuration=Release
+W:\OneDrive\Utils\nuget.exe pack -Prop Configuration=Release
 PAUSE

@@ -57,8 +57,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AjaxMinScriptBundle.cs" />
-    <Compile Include="AjaxMinScriptBundleBuilder.cs" />
+    <Compile Include="ScriptWithSourceMapBundle.cs" />
+    <Compile Include="ScriptWithSourceMapBundleBuilder.cs" />
     <Compile Include="CssRewriteUrlTransformFixed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

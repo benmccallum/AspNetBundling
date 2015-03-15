@@ -1,8 +1,7 @@
-﻿using System.Diagnostics;
-
-using Microsoft.Ajax.Utilities;
+﻿using Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Web.Hosting;
@@ -12,9 +11,9 @@ namespace AspNetBundling
 {
     /// <summary>
     /// Represents a custom AjaxMin bundle builder for bundling from individual file contents.
-    /// Generates source map files for JS and CSS.
+    /// Generates source map files for JS.
     /// </summary>
-    public class AjaxMinScriptBundleBuilder : IBundleBuilder
+    public class ScriptWithSourceMapBundleBuilder : IBundleBuilder
     {
         public string BuildBundleContent(Bundle bundle, BundleContext context, IEnumerable<BundleFile> files)
         {
@@ -86,7 +85,7 @@ namespace AspNetBundling
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(AjaxMinScriptBundleBuilder));
+                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(ScriptWithSourceMapBundleBuilder));
                 return GenerateGenericErrorsContent(contentConcatedString);
             }
         }
