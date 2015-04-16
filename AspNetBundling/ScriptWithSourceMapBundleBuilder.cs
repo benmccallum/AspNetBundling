@@ -33,19 +33,7 @@ namespace AspNetBundling
             // Generates source map using an approach documented here: http://ajaxmin.codeplex.com/discussions/446616
 
             // Get paths and create any directories required
-            var mapVirtualPath = bundle.Path + ".map";
             var sourcePath = HostingEnvironment.MapPath(bundle.Path);
-            var mapPath = HostingEnvironment.MapPath(mapVirtualPath);
-            var directoryPath = Path.GetDirectoryName(mapPath);
-            if (directoryPath == null)
-            {
-                throw new InvalidOperationException("directoryPath was invalid.");
-            }
-
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
 
             // Concatenate file contents to be minified, including the sourcemap hints
             var contentConcatedString = GetContentConcated(files);
@@ -54,8 +42,9 @@ namespace AspNetBundling
             try
             {
                 var contentBuilder = new StringBuilder();
+                var mapBuilder = new StringBuilder();
                 using (var contentWriter = new StringWriter(contentBuilder))
-                using (var mapWriter = new StreamWriter(mapPath, false, new UTF8Encoding(false)))
+                using (var mapWriter = new StringWriter(mapBuilder))
                 using (var sourceMap = new V3SourceMap(mapWriter))
                 {
                     var settings = new CodeSettings()
@@ -66,7 +55,7 @@ namespace AspNetBundling
                         TermSemicolons = true
                     };
 
-                    sourceMap.StartPackage(sourcePath, mapPath);
+                    sourceMap.StartPackage(sourcePath, sourcePath);
 
                     var minifier = new Minifier();
                     string contentMinified = minifier.MinifyJavaScript(contentConcatedString, settings);
@@ -81,7 +70,11 @@ namespace AspNetBundling
                     sourceMap.EndFile(contentWriter, "\r\n");
                 }
 
-                return contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=").ToString();
+                var sourceMapString = mapBuilder.ToString();
+                var sourceMapBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceMapString));
+                contentBuilder.Replace("//@ sourceMappingURL=", string.Format("//# sourceMappingURL=data:application/json;charset:utf-8;base64,{0}", sourceMapBase64));
+
+                return contentBuilder.ToString();
             }
             catch (Exception ex)
             {
@@ -122,7 +115,7 @@ namespace AspNetBundling
             {
                 // Get a file path to save the transformed contents as 
                 var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
-                
+
                 // Get the contents of the bundle,
                 // noting it may have transforms applied that could mess with any source mapping we want to do
                 var contents = file.ApplyTransforms();
@@ -131,7 +124,7 @@ namespace AspNetBundling
                 if (file.Transforms.Count > 0)
                 {
                     // Write the transformed contents to disk to refer our mapping to
-                    filePath = Path.ChangeExtension(filePath, ".transformed" + Path.GetExtension(filePath));                    
+                    filePath = Path.ChangeExtension(filePath, ".transformed" + Path.GetExtension(filePath));
                     File.WriteAllText(filePath, contents);
                 }
 
