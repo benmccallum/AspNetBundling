@@ -72,7 +72,8 @@ namespace AspNetBundling
 
                 var sourceMapString = mapBuilder.ToString();
                 var sourceMapBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceMapString));
-                contentBuilder.Replace("//@ sourceMappingURL=", string.Format("//# sourceMappingURL=data:application/json;charset:utf-8;base64,{0}", sourceMapBase64));
+                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL")
+                contentBuilder.Replace("sourceMappingURL=", string.Format("sourceMappingURL=data:application/json;charset:utf-8;base64,{0}", sourceMapBase64));
 
                 return contentBuilder.ToString();
             }
