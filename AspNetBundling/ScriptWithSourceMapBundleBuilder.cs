@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Web;
 using System.Web.Hosting;
 using System.Web.Optimization;
 
@@ -32,8 +33,9 @@ namespace AspNetBundling
 
             // Generates source map using an approach documented here: http://ajaxmin.codeplex.com/discussions/446616
 
-            // Get paths and create any directories required
-            var sourcePath = HostingEnvironment.MapPath(bundle.Path);
+            var sourcePath = VirtualPathUtility.ToAbsolute(bundle.Path);
+            var mapVirtualPath = string.Concat(bundle.Path, ".map");
+            var mapPath = VirtualPathUtility.ToAbsolute(mapVirtualPath);
 
             // Concatenate file contents to be minified, including the sourcemap hints
             var contentConcatedString = GetContentConcated(files);
@@ -55,7 +57,7 @@ namespace AspNetBundling
                         TermSemicolons = true
                     };
 
-                    sourceMap.StartPackage(sourcePath, sourcePath);
+                    sourceMap.StartPackage(sourcePath, mapPath);
 
                     var minifier = new Minifier();
                     string contentMinified = minifier.MinifyJavaScript(contentConcatedString, settings);
@@ -70,10 +72,20 @@ namespace AspNetBundling
                     sourceMap.EndFile(contentWriter, "\r\n");
                 }
 
-                var sourceMapString = mapBuilder.ToString();
-                var sourceMapBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceMapString));
-                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
-                contentBuilder.Replace("sourceMappingURL=", string.Format("sourceMappingURL=data:application/json;charset:utf-8;base64,{0}", sourceMapBase64));
+                
+                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");                
+
+                var mapBundle = context.BundleCollection.GetBundleFor(mapVirtualPath);
+                if (mapBundle == null)
+                {
+                    mapBundle = new SourceMapBundle(mapVirtualPath);
+                }
+                var correctlyCastMapBundle = mapBundle as SourceMapBundle;
+                if (correctlyCastMapBundle == null)
+                {
+                    throw new InvalidOperationException("TODO");
+                }
+                correctlyCastMapBundle.SetContent(mapBuilder.ToString());
 
                 return contentBuilder.ToString();
             }
