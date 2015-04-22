@@ -83,7 +83,7 @@ namespace AspNetBundling
                 var correctlyCastMapBundle = mapBundle as SourceMapBundle;
                 if (correctlyCastMapBundle == null)
                 {
-                    throw new InvalidOperationException("TODO");
+                    throw new InvalidOperationException(string.Format("There is a bundle on the VirtualPath '{0}' of the type '{1}' when it was expected to be of the type 'SourceMapBundle'. That Virtual Path is reserved for the SourceMaps.", mapVirtualPath, mapBundle.GetType()));
                 }
                 correctlyCastMapBundle.SetContent(mapBuilder.ToString());
 
