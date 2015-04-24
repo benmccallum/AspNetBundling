@@ -1,4 +1,5 @@
-﻿using Microsoft.Ajax.Utilities;
+﻿extern alias AjaxMin;
+using AjaxMin::Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -67,13 +68,7 @@ namespace AspNetBundling
                     }
 
                     contentWriter.Write(contentMinified);
-
-                    sourceMap.EndPackage();
-                    sourceMap.EndFile(contentWriter, "\r\n");
                 }
-
-                
-                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");                
 
                 var mapBundle = context.BundleCollection.GetBundleFor(mapVirtualPath);
                 if (mapBundle == null)
