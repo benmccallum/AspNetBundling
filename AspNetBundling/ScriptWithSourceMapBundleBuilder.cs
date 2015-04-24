@@ -1,12 +1,11 @@
-﻿using Microsoft.Ajax.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Web;
-using System.Web.Hosting;
 using System.Web.Optimization;
+using Microsoft.Ajax.Utilities;
 
 namespace AspNetBundling
 {
@@ -74,7 +73,7 @@ namespace AspNetBundling
                 
                 contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
 
-                AddContentToSourceMapBundle(context, mapVirtualPath, mapBuilder.ToString());
+                AddContentToAdHocBundle(context, mapVirtualPath, mapBuilder.ToString());
 
                 return contentBuilder.ToString();
             }
@@ -115,9 +114,6 @@ namespace AspNetBundling
 
             foreach (var file in files)
             {
-                // Get a file path to save the transformed contents as 
-                var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
-
                 // Get the contents of the bundle,
                 // noting it may have transforms applied that could mess with any source mapping we want to do
                 var contents = file.ApplyTransforms();
@@ -126,26 +122,27 @@ namespace AspNetBundling
                 if (file.Transforms.Count > 0)
                 {
                     // Write the transformed contents to disk to refer our mapping to
-                    var virtualPathTransformed = "~/" + Path.ChangeExtension(file.VirtualFile.VirtualPath, ".transformed" + Path.GetExtension(filePath));
-                    AddContentToSourceMapBundle(context, virtualPathTransformed, contents);
+                    var fileVirtualPath = file.IncludedVirtualPath;
+                    var virtualPathTransformed = "~/" + Path.ChangeExtension(fileVirtualPath, string.Concat(".transformed",  Path.GetExtension(fileVirtualPath)));
+                    AddContentToAdHocBundle(context, virtualPathTransformed, contents);
                 }
 
                 // Source header line then source code
-                contentConcated.AppendLine("///#source 1 1 " + filePath);
+                contentConcated.AppendLine("///#source 1 1 " + file.VirtualFile.VirtualPath);
                 contentConcated.AppendLine(contents);
             }
 
             return contentConcated.ToString();
         }
 
-        private static void AddContentToSourceMapBundle(BundleContext context, string virtualPath, string content)
+        private static void AddContentToAdHocBundle(BundleContext context, string virtualPath, string content)
         {
             var mapBundle = context.BundleCollection.GetBundleFor(virtualPath);
             if (mapBundle == null)
             {
-                mapBundle = new SourceMapBundle(virtualPath);
+                mapBundle = new AdHocBundle(virtualPath);
             }
-            var correctlyCastMapBundle = mapBundle as SourceMapBundle;
+            var correctlyCastMapBundle = mapBundle as AdHocBundle;
             if (correctlyCastMapBundle == null)
             {
                 throw new InvalidOperationException(string.Format("There is a bundle on the VirtualPath '{0}' of the type '{1}' when it was expected to be of the type 'SourceMapBundle'. That Virtual Path is reserved for the SourceMaps.", virtualPath, mapBundle.GetType()));
