@@ -38,7 +38,7 @@ namespace AspNetBundling
             var mapPath = VirtualPathUtility.ToAbsolute(mapVirtualPath);
 
             // Concatenate file contents to be minified, including the sourcemap hints
-            var contentConcatedString = GetContentConcated(files);
+            var contentConcatedString = GetContentConcated(context, files);
 
             // Try minify (+ source map) using AjaxMin dll
             try
@@ -71,21 +71,10 @@ namespace AspNetBundling
                     sourceMap.EndPackage();
                     sourceMap.EndFile(contentWriter, "\r\n");
                 }
-
                 
-                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");                
+                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
 
-                var mapBundle = context.BundleCollection.GetBundleFor(mapVirtualPath);
-                if (mapBundle == null)
-                {
-                    mapBundle = new SourceMapBundle(mapVirtualPath);
-                }
-                var correctlyCastMapBundle = mapBundle as SourceMapBundle;
-                if (correctlyCastMapBundle == null)
-                {
-                    throw new InvalidOperationException(string.Format("There is a bundle on the VirtualPath '{0}' of the type '{1}' when it was expected to be of the type 'SourceMapBundle'. That Virtual Path is reserved for the SourceMaps.", mapVirtualPath, mapBundle.GetType()));
-                }
-                correctlyCastMapBundle.SetContent(mapBuilder.ToString());
+                AddContentToSourceMapBundle(context, mapVirtualPath, mapBuilder.ToString());
 
                 return contentBuilder.ToString();
             }
@@ -120,7 +109,7 @@ namespace AspNetBundling
             return sbContent.ToString();
         }
 
-        private static string GetContentConcated(IEnumerable<BundleFile> files)
+        private static string GetContentConcated(BundleContext context, IEnumerable<BundleFile> files)
         {
             var contentConcated = new StringBuilder();
 
@@ -137,8 +126,8 @@ namespace AspNetBundling
                 if (file.Transforms.Count > 0)
                 {
                     // Write the transformed contents to disk to refer our mapping to
-                    filePath = Path.ChangeExtension(filePath, ".transformed" + Path.GetExtension(filePath));
-                    File.WriteAllText(filePath, contents);
+                    var virtualPathTransformed = "~/" + Path.ChangeExtension(file.VirtualFile.VirtualPath, ".transformed" + Path.GetExtension(filePath));
+                    AddContentToSourceMapBundle(context, virtualPathTransformed, contents);
                 }
 
                 // Source header line then source code
@@ -147,6 +136,21 @@ namespace AspNetBundling
             }
 
             return contentConcated.ToString();
+        }
+
+        private static void AddContentToSourceMapBundle(BundleContext context, string virtualPath, string content)
+        {
+            var mapBundle = context.BundleCollection.GetBundleFor(virtualPath);
+            if (mapBundle == null)
+            {
+                mapBundle = new SourceMapBundle(virtualPath);
+            }
+            var correctlyCastMapBundle = mapBundle as SourceMapBundle;
+            if (correctlyCastMapBundle == null)
+            {
+                throw new InvalidOperationException(string.Format("There is a bundle on the VirtualPath '{0}' of the type '{1}' when it was expected to be of the type 'SourceMapBundle'. That Virtual Path is reserved for the SourceMaps.", virtualPath, mapBundle.GetType()));
+            }
+            correctlyCastMapBundle.SetContent(content);
         }
     }
 }
