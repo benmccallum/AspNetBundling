@@ -66,8 +66,8 @@
     <Compile Include="ScriptWithSourceMapBundleBuilder.cs" />
     <Compile Include="CssRewriteUrlTransformFixed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SourceMapBundle.cs" />
-    <Compile Include="SourceMapBundleBuilder.cs" />
+    <Compile Include="AdHocBundle.cs" />
+    <Compile Include="AdHocBundleBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

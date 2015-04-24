@@ -2,14 +2,17 @@
 
 namespace AspNetBundling
 {
-    internal class SourceMapBundle : Bundle
+    /// <summary>
+    /// An Bundle that has content added at runtime. For internal usage only.
+    /// </summary>
+    internal class AdHocBundle : Bundle
     {
         public string Content { get; private set; }
 
-        public SourceMapBundle(string virtualPath)
+        public AdHocBundle(string virtualPath)
             : base(virtualPath)
         {
-            Builder = new SourceMapBundleBuilder(this);
+            Builder = new AdHocBundleBuilder();
         }
 
         internal void SetContent(string sourceMapContent)
