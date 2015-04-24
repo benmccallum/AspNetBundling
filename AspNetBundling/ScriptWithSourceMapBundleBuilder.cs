@@ -31,7 +31,6 @@ namespace AspNetBundling
             }
 
             // Generates source map using an approach documented here: http://ajaxmin.codeplex.com/discussions/446616
-
             var sourcePath = VirtualPathUtility.ToAbsolute(bundle.Path);
             var mapVirtualPath = string.Concat(bundle.Path, ".map");
             var mapPath = VirtualPathUtility.ToAbsolute(mapVirtualPath);
@@ -73,6 +72,7 @@ namespace AspNetBundling
                 
                 contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
 
+                //Write the SourceMap to another Bundle
                 AddContentToAdHocBundle(context, mapVirtualPath, mapBuilder.ToString());
 
                 return contentBuilder.ToString();
@@ -88,7 +88,7 @@ namespace AspNetBundling
         {
             var sbContent = new StringBuilder();
             sbContent.Append("/* ");
-            sbContent.Append("An error occurred during minification, see Sitecore log for more details - returning concatenated content unminified.").Append("\r\n");
+            sbContent.Append("An error occurred during minification, see Trace log for more details - returning concatenated content unminified.").Append("\r\n");
             sbContent.Append(" */\r\n");
             sbContent.Append(contentConcatedString);
             return sbContent.ToString();
@@ -121,7 +121,7 @@ namespace AspNetBundling
                 // If there were transforms that were applied
                 if (file.Transforms.Count > 0)
                 {
-                    // Write the transformed contents to disk to refer our mapping to
+                    // Write the transformed contents to another Bundle
                     var fileVirtualPath = file.IncludedVirtualPath;
                     var virtualPathTransformed = "~/" + Path.ChangeExtension(fileVirtualPath, string.Concat(".transformed",  Path.GetExtension(fileVirtualPath)));
                     AddContentToAdHocBundle(context, virtualPathTransformed, contents);

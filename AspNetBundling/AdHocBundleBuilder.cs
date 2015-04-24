@@ -4,6 +4,9 @@ using System.Web.Optimization;
 
 namespace AspNetBundling
 {
+    /// <summary>
+    /// A BundleBuilder that wil render the Content added to a Bundle at runtime. For Internal usage only
+    /// </summary>
     internal class AdHocBundleBuilder : IBundleBuilder
     {
         public string BuildBundleContent(Bundle bundle, BundleContext context, IEnumerable<BundleFile> files)
