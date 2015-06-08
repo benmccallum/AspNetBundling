@@ -1,11 +1,11 @@
-﻿using Microsoft.Ajax.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Web.Hosting;
+using System.Web;
 using System.Web.Optimization;
+using Microsoft.Ajax.Utilities;
 
 namespace AspNetBundling
 {
@@ -31,31 +31,20 @@ namespace AspNetBundling
             }
 
             // Generates source map using an approach documented here: http://ajaxmin.codeplex.com/discussions/446616
-
-            // Get paths and create any directories required
-            var mapVirtualPath = bundle.Path + ".map";
-            var sourcePath = HostingEnvironment.MapPath(bundle.Path);
-            var mapPath = HostingEnvironment.MapPath(mapVirtualPath);
-            var directoryPath = Path.GetDirectoryName(mapPath);
-            if (directoryPath == null)
-            {
-                throw new InvalidOperationException("directoryPath was invalid.");
-            }
-
-            if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
+            var sourcePath = VirtualPathUtility.ToAbsolute(bundle.Path);
+            var mapVirtualPath = string.Concat(bundle.Path, ".map");
+            var mapPath = VirtualPathUtility.ToAbsolute(mapVirtualPath);
 
             // Concatenate file contents to be minified, including the sourcemap hints
-            var contentConcatedString = GetContentConcated(files);
+            var contentConcatedString = GetContentConcated(context, files);
 
             // Try minify (+ source map) using AjaxMin dll
             try
             {
                 var contentBuilder = new StringBuilder();
+                var mapBuilder = new StringBuilder();
                 using (var contentWriter = new StringWriter(contentBuilder))
-                using (var mapWriter = new StreamWriter(mapPath, false, new UTF8Encoding(false)))
+                using (var mapWriter = new StringWriter(mapBuilder))
                 using (var sourceMap = new V3SourceMap(mapWriter))
                 {
                     var settings = new CodeSettings()
@@ -80,8 +69,13 @@ namespace AspNetBundling
                     sourceMap.EndPackage();
                     sourceMap.EndFile(contentWriter, "\r\n");
                 }
+                
+                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
 
-                return contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=").ToString();
+                //Write the SourceMap to another Bundle
+                AddContentToAdHocBundle(context, mapVirtualPath, mapBuilder.ToString());
+
+                return contentBuilder.ToString();
             }
             catch (Exception ex)
             {
@@ -94,7 +88,7 @@ namespace AspNetBundling
         {
             var sbContent = new StringBuilder();
             sbContent.Append("/* ");
-            sbContent.Append("An error occurred during minification, see Sitecore log for more details - returning concatenated content unminified.").Append("\r\n");
+            sbContent.Append("An error occurred during minification, see Trace log for more details - returning concatenated content unminified.").Append("\r\n");
             sbContent.Append(" */\r\n");
             sbContent.Append(contentConcatedString);
             return sbContent.ToString();
@@ -114,15 +108,12 @@ namespace AspNetBundling
             return sbContent.ToString();
         }
 
-        private static string GetContentConcated(IEnumerable<BundleFile> files)
+        private static string GetContentConcated(BundleContext context, IEnumerable<BundleFile> files)
         {
             var contentConcated = new StringBuilder();
 
             foreach (var file in files)
             {
-                // Get a file path to save the transformed contents as 
-                var filePath = HostingEnvironment.MapPath(file.VirtualFile.VirtualPath);
-                
                 // Get the contents of the bundle,
                 // noting it may have transforms applied that could mess with any source mapping we want to do
                 var contents = file.ApplyTransforms();
@@ -130,17 +121,33 @@ namespace AspNetBundling
                 // If there were transforms that were applied
                 if (file.Transforms.Count > 0)
                 {
-                    // Write the transformed contents to disk to refer our mapping to
-                    filePath = Path.ChangeExtension(filePath, ".transformed" + Path.GetExtension(filePath));                    
-                    File.WriteAllText(filePath, contents);
+                    // Write the transformed contents to another Bundle
+                    var fileVirtualPath = file.IncludedVirtualPath;
+                    var virtualPathTransformed = "~/" + Path.ChangeExtension(fileVirtualPath, string.Concat(".transformed",  Path.GetExtension(fileVirtualPath)));
+                    AddContentToAdHocBundle(context, virtualPathTransformed, contents);
                 }
 
                 // Source header line then source code
-                contentConcated.AppendLine("///#source 1 1 " + filePath);
+                contentConcated.AppendLine("///#source 1 1 " + file.VirtualFile.VirtualPath);
                 contentConcated.AppendLine(contents);
             }
 
             return contentConcated.ToString();
+        }
+
+        private static void AddContentToAdHocBundle(BundleContext context, string virtualPath, string content)
+        {
+            var mapBundle = context.BundleCollection.GetBundleFor(virtualPath);
+            if (mapBundle == null)
+            {
+                mapBundle = new AdHocBundle(virtualPath);
+            }
+            var correctlyCastMapBundle = mapBundle as AdHocBundle;
+            if (correctlyCastMapBundle == null)
+            {
+                throw new InvalidOperationException(string.Format("There is a bundle on the VirtualPath '{0}' of the type '{1}' when it was expected to be of the type 'SourceMapBundle'. That Virtual Path is reserved for the SourceMaps.", virtualPath, mapBundle.GetType()));
+            }
+            correctlyCastMapBundle.SetContent(content);
         }
     }
 }
