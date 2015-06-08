@@ -17,6 +17,11 @@ Bundling with SourceMap generation
       .Include("MyJsFileOne.js", "MyJsFileTwo.js")
     );
 
+### Known issues:
+1. A current bug in AjaxMin reported by @LodewijkSioen here https://ajaxmin.codeplex.com/workitem/21834,
+causes the minification to hang when the debugger is attached and we're trying to do proper sourcemapping. As such,
+to avoid more harm than good, we don't support proper source mapping in this scenario until AjaxMin fixes it's bug.
+
 
 Bundling with Css Rewrite Url Tranformer fix
 ---------------------------------------------------------
