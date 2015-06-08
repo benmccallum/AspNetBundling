@@ -1,11 +1,12 @@
-﻿using System;
+extern alias AjaxMin;
+using AjaxMin::Microsoft.Ajax.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.Optimization;
-using Microsoft.Ajax.Utilities;
 
 namespace AspNetBundling
 {
@@ -65,12 +66,7 @@ namespace AspNetBundling
                     }
 
                     contentWriter.Write(contentMinified);
-
-                    sourceMap.EndPackage();
-                    sourceMap.EndFile(contentWriter, "\r\n");
                 }
-                
-                contentBuilder.Replace("//@ sourceMappingURL=", "//# sourceMappingURL=");
 
                 //Write the SourceMap to another Bundle
                 AddContentToAdHocBundle(context, mapVirtualPath, mapBuilder.ToString());
