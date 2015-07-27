@@ -15,3 +15,9 @@ select,
 textarea {
     max-width: 280px;
 }
+
+#non-base64-data-uri-test {
+    height: 100px;
+    width: 100px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='1'><rect fill='#c8c7cc' x='0' y='0' width='100%' height='0.5'/></svg>");
+}

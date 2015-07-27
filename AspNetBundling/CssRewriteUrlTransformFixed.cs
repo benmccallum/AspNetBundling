@@ -8,17 +8,25 @@ namespace System.Web.Optimization
     /// </summary>
     public class CssRewriteUrlTransformFixed : IItemTransform
     {
-        private static string RebaseUrlToAbsolute(string baseUrl, string url)
+        private static string RebaseUrlToAbsolute(string baseUrl, string url, string prefix, string suffix)
         {
             if (string.IsNullOrWhiteSpace(url) || string.IsNullOrWhiteSpace(baseUrl) || url.StartsWith("/", StringComparison.OrdinalIgnoreCase)
-				|| url.StartsWith("data:") || url.StartsWith("http://") || url.StartsWith("https://"))
+				 || url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 return url;
             }
+
+            if (url.StartsWith("data:"))
+            {
+                // Keep the prefix and suffix quotation chars as is in case they are needed (e.g. non-base64 encoded svg)
+                return prefix + url + suffix; 
+            }
+
             if (!baseUrl.EndsWith("/", StringComparison.OrdinalIgnoreCase))
             {
                 baseUrl += "/";
             }
+
             return VirtualPathUtility.ToAbsolute(baseUrl + url);
         }
         private static string ConvertUrlsToAbsolute(string baseUrl, string content)
@@ -27,8 +35,8 @@ namespace System.Web.Optimization
             {
                 return content;
             }
-            var regex = new Regex("url\\(['\"]?(?<url>[^)]+?)['\"]?\\)");
-            return regex.Replace(content, (Match match) => "url(" + CssRewriteUrlTransformFixed.RebaseUrlToAbsolute(baseUrl, match.Groups["url"].Value) + ")");
+            var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
+            return regex.Replace(content, (Match match) => "url(" + CssRewriteUrlTransformFixed.RebaseUrlToAbsolute(baseUrl, match.Groups["url"].Value, match.Groups["prefix"].Value, match.Groups["suffix"].Value) + ")");
         }
         public string Process(string includedVirtualPath, string input)
         {
