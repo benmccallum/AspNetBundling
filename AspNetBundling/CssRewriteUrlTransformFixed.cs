@@ -3,8 +3,11 @@ namespace System.Web.Optimization
     using System.Text.RegularExpressions;
 
     /// <summary>
-    /// Fix for the standard System.Web.Optimization.CssRewriteUrlTransform which doesn't play nice with data URIs.
-    /// I've logged the bug on codeplex, but this will have to do for now: https://aspnetoptimization.codeplex.com/workitem/88
+    /// Fixes for the standard System.Web.Optimization.CssRewriteUrlTransform. 
+    /// Now plays nice with:
+    ///  * Data URIs, including svgs (https://aspnetoptimization.codeplex.com/workitem/88)
+    ///  * URLs to other resources that are already absolute 
+    ///  * Virtual directories (http://aspnetoptimization.codeplex.com/workitem/83)
     /// </summary>
     public class CssRewriteUrlTransformFixed : IItemTransform
     {
@@ -35,7 +38,9 @@ namespace System.Web.Optimization
             {
                 return content;
             }
+
             var regex = new Regex("url\\((?<prefix>['\"]?)(?<url>[^)]+?)(?<suffix>['\"]?)\\)");
+
             return regex.Replace(content, (Match match) => "url(" + CssRewriteUrlTransformFixed.RebaseUrlToAbsolute(baseUrl, match.Groups["url"].Value, match.Groups["prefix"].Value, match.Groups["suffix"].Value) + ")");
         }
         public string Process(string includedVirtualPath, string input)
@@ -44,7 +49,13 @@ namespace System.Web.Optimization
             {
                 throw new ArgumentNullException("includedVirtualPath");
             }
-            var directory = VirtualPathUtility.GetDirectory(includedVirtualPath.Substring(1));
+            if (includedVirtualPath.Length < 1 || includedVirtualPath[0] != '~')
+            {
+                throw new ArgumentException("includedVirtualPath must be valid ( i.e. have a length and start with ~ )");
+            }
+
+            var directory = VirtualPathUtility.GetDirectory(includedVirtualPath);
+
             return CssRewriteUrlTransformFixed.ConvertUrlsToAbsolute(directory, input);
         }
     }
