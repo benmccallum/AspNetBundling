@@ -53,7 +53,8 @@ namespace AspNetBundling
                         EvalTreatment = EvalTreatment.MakeImmediateSafe,
                         PreserveImportantComments = false,
                         SymbolsMap = sourceMap,
-                        TermSemicolons = true
+                        TermSemicolons = true,
+                        MinifyCode = preserveVariablesNames
                     };
 
                     sourceMap.StartPackage(sourcePath, mapPath);
@@ -172,5 +173,7 @@ namespace AspNetBundling
         }
 
         const string sourceMappingDisabledMsg = "/* Source mapping won't work properly right now, sorry! The debugger is attached and the following bug exists in AjaxMin: https://ajaxmin.codeplex.com/workitem/21834 */";
+
+        internal bool preserveVariablesNames = false;
     }
 }
