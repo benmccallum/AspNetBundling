@@ -11,7 +11,10 @@ namespace AspNetBundling.TestWebsite
             bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery")
                 .Include("~/Scripts/jquery-{version}.js"));
 
-            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jqueryval")
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery-no-important-comments", null, true, false)
+                .Include("~/Scripts/jquery-{version}.js"));
+
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jqueryval", null, true, true)
                 .Include("~/Scripts/jquery.validate*"));
 
             // Use the development version of Modernizr to develop with and learn from. Then, when you're
