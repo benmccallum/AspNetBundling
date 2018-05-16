@@ -84,7 +84,20 @@ namespace AspNetBundling
             }
             catch (Exception ex)
             {
-                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details.", ex, typeof(ScriptWithSourceMapBundleBuilder));
+                // only Trace the fact that an exception occurred to the Warning output, but use Informational tracing for added detail for diagnosis
+                Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details in Information.");
+                
+                string bundlePrefix = "[Bundle '" + bundle.Path + "']";
+                Trace.TraceInformation(bundlePrefix + " exception message: " + ex.Message);
+                
+                if (!string.IsNullOrEmpty(ex.InnerException?.Message))
+                {
+                    Trace.TraceInformation(bundlePrefix + " inner exception message: " + ex.InnerException.Message);
+                }
+                
+                Trace.TraceInformation(bundlePrefix + " source: " + ex.Source);
+                Trace.TraceInformation(bundlePrefix + " stack trace: " + ex.StackTrace);
+                
                 return GenerateGenericErrorsContent(contentConcatedString);
             }
         }
