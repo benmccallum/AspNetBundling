@@ -90,7 +90,7 @@ namespace AspNetBundling
                 string bundlePrefix = "[Bundle '" + bundle.Path + "']";
                 Trace.TraceInformation(bundlePrefix + " exception message: " + ex.Message);
                 
-                if (!string.IsNullOrEmpty(ex.InnerException?.Message))
+                if (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message))
                 {
                     Trace.TraceInformation(bundlePrefix + " inner exception message: " + ex.InnerException.Message);
                 }
