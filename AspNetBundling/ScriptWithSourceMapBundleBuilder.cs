@@ -148,7 +148,7 @@ namespace AspNetBundling
                 // Source header line then source code
                 // Note: A current bug in AjaxMin reported by @LodewijkSioen here https://ajaxmin.codeplex.com/workitem/21834,
                 // causes the MinifyJavascript method call to hang when debugger is attached if the following line is included.
-                // To avoid more harm than good, don't support proper source mapping in this scenario until AjaxMin fixes it's bug.
+                // To avoid more harm than good, don't support proper source mapping in this scenario until AjaxMin fixes its bug.
                 if (!System.Diagnostics.Debugger.IsAttached)
                 {
                     contentConcated.AppendLine("///#source 1 1 " + file.VirtualFile.VirtualPath);
