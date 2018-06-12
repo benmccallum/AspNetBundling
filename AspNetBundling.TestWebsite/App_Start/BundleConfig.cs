@@ -1,5 +1,4 @@
-﻿using System.Web;
-using System.Web.Optimization;
+﻿using System.Web.Optimization;
 
 namespace AspNetBundling.TestWebsite
 {
@@ -8,7 +7,7 @@ namespace AspNetBundling.TestWebsite
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery")
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery", null, true, true, ".bundle")
                 .Include("~/Scripts/jquery-{version}.js"));
 
             bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery-no-important-comments", null, true, false)
