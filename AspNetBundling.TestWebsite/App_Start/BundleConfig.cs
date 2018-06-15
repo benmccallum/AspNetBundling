@@ -7,7 +7,20 @@ namespace AspNetBundling.TestWebsite
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
-            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery", null, true, true, ".bundle")
+            // Default (
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery")
+                .Include("~/Scripts/jquery-{version}.js"));
+
+            // Without providing a sourceMapExtension, appends "map" to end of bundleVirtualPath and works out-of-the-box
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery", null, true, true) 
+                .Include("~/Scripts/jquery-{version}.js"));
+
+            // Providing a sourceMapExtension requires additional config of a handler for the extension (see web.config > handlers > *.map)
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery-with-dotmap-ext", null, true, true, ".map")
+                .Include("~/Scripts/jquery-{version}.js"));
+
+            // Providing a sourceMapExtension requires additional config of a handler for the extension (see web.config > handlers > *.bundle)
+            bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery-with-dotbundle-ext", null, true, true, ".bundle")
                 .Include("~/Scripts/jquery-{version}.js"));
 
             bundles.Add(new ScriptWithSourceMapBundle("~/bundles/jquery-no-important-comments", null, true, false)

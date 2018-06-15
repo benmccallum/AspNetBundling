@@ -10,15 +10,17 @@ namespace AspNetBundling
     {
         /// <summary>
         /// Initializes a new instance of the ScriptWithSourceMapBundle class that takes a virtual path for the bundle.
+        /// Config: no cdnPath, minifyCode on, preserveImportantComments on, source map path = bundleVirtualPath + "map"
         /// </summary>
         public ScriptWithSourceMapBundle(string virtualPath)
-            : this(virtualPath, null, false, true, DefaultSourceMapExtension)
+            : this(virtualPath, null, true, true, DefaultSourceMapExtension)
         {
 
         }
 
         /// <summary>
         /// Initializes a new instance of the ScriptWithSourceMapBundle class that takes a virtual path and a cdnPath for the bundle.
+        /// Config: cdnPath, minifyCode on, preserveImportantComments on, source map path = bundleVirtualPath + "map"
         /// </summary>
         public ScriptWithSourceMapBundle(string virtualPath, string cdnPath)
             : this(virtualPath, cdnPath, true, true, DefaultSourceMapExtension)
@@ -29,6 +31,7 @@ namespace AspNetBundling
         /// <summary>
         /// Initializes a new instance of the ScriptWithSourceMapBundle class that takes a virtual path 
         /// and allows code minification to be toggled.
+        /// Config: no cdnPath, minifyCode as passed, preserveImportantComments on, source map path = bundleVirtualPath + "map"
         /// </summary>
         /// <param name="minifyCode">Preserve variables names in scripts </param>
         public ScriptWithSourceMapBundle(string virtualPath, bool minifyCode)
@@ -40,10 +43,11 @@ namespace AspNetBundling
         /// <summary>
         /// Initializes a new instance of the ScriptWithSourceMapBundle that takes a virtual path, a cdnPath,
         /// allows code minification to be toggled and preservation of important comments.
+        /// Config: all as passed, source map path = bundleVirtualPath + "map"
         /// </summary>
         /// <param name="preserveImportantComments">Toggle to preserve important comments when needed (e.g. legal requirement for a library)</param>
         public ScriptWithSourceMapBundle(string virtualPath, string cdnPath, bool minifyCode, bool preserveImportantComments)
-          : this(virtualPath, null, minifyCode, preserveImportantComments, DefaultSourceMapExtension)
+          : this(virtualPath, cdnPath, minifyCode, preserveImportantComments, DefaultSourceMapExtension)
         {
 
         }

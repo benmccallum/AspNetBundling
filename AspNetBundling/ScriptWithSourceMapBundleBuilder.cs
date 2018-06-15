@@ -187,7 +187,7 @@ namespace AspNetBundling
 
         const string sourceMappingDisabledMsg = "/* Source mapping won't work properly right now, sorry! The debugger is attached and the following bug exists in AjaxMin: https://ajaxmin.codeplex.com/workitem/21834 */";
 
-        internal bool minifyCode = false;
+        internal bool minifyCode = true;
 
         internal bool preserveImportantComments = true;
 
