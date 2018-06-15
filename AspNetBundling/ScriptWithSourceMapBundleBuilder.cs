@@ -1,5 +1,4 @@
 extern alias AjaxMin;
-using AjaxMin::Microsoft.Ajax.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.Optimization;
+using AjaxMin::Microsoft.Ajax.Utilities;
 
 namespace AspNetBundling
 {
@@ -33,7 +33,7 @@ namespace AspNetBundling
 
             // Generates source map using an approach documented here: http://ajaxmin.codeplex.com/discussions/446616
             var sourcePath = VirtualPathUtility.ToAbsolute(bundle.Path);
-            var mapVirtualPath = string.Concat(bundle.Path, "map"); // don't use .map so it's picked up by the bundle module
+            var mapVirtualPath = string.Concat(bundle.Path, sourceMapExtension);
             var mapPath = VirtualPathUtility.ToAbsolute(mapVirtualPath);
 
             // Concatenate file contents to be minified, including the sourcemap hints
@@ -86,18 +86,18 @@ namespace AspNetBundling
             {
                 // only Trace the fact that an exception occurred to the Warning output, but use Informational tracing for added detail for diagnosis
                 Trace.TraceWarning("An exception occurred trying to build bundle contents for bundle with virtual path: " + bundle.Path + ". See Exception details in Information.");
-                
+
                 string bundlePrefix = "[Bundle '" + bundle.Path + "']";
                 Trace.TraceInformation(bundlePrefix + " exception message: " + ex.Message);
-                
+
                 if (ex.InnerException != null && !string.IsNullOrEmpty(ex.InnerException.Message))
                 {
                     Trace.TraceInformation(bundlePrefix + " inner exception message: " + ex.InnerException.Message);
                 }
-                
+
                 Trace.TraceInformation(bundlePrefix + " source: " + ex.Source);
                 Trace.TraceInformation(bundlePrefix + " stack trace: " + ex.StackTrace);
-                
+
                 return GenerateGenericErrorsContent(contentConcatedString);
             }
         }
@@ -141,7 +141,7 @@ namespace AspNetBundling
                 {
                     // Write the transformed contents to another Bundle
                     var fileVirtualPath = file.IncludedVirtualPath;
-                    var virtualPathTransformed = "~/" + Path.ChangeExtension(fileVirtualPath, string.Concat(".transformed",  Path.GetExtension(fileVirtualPath)));
+                    var virtualPathTransformed = "~/" + Path.ChangeExtension(fileVirtualPath, string.Concat(".transformed", Path.GetExtension(fileVirtualPath)));
                     AddContentToAdHocBundle(context, virtualPathTransformed, contents);
                 }
 
@@ -190,5 +190,7 @@ namespace AspNetBundling
         internal bool minifyCode = false;
 
         internal bool preserveImportantComments = true;
+
+        internal string sourceMapExtension = ScriptWithSourceMapBundle.DefaultSourceMapExtension;
     }
 }
